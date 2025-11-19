@@ -5,11 +5,7 @@ const linkRoutes = require("./routes/linkRoutes");
 const app = express();
 
 // CORS middleware with origin config
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-  })
-);
+app.use(cors());
 
 app.use(express.json());
 app.use(linkRoutes);
