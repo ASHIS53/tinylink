@@ -1,33 +1,35 @@
 import { useEffect, useState } from "react";
-const api = import.meta.env.VITE_API_URL;
+import { LINKS_API, API_BASE } from "../utils/api";
 
 export default function LinkTable() {
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  async function fetchLinks() {
+  const fetchLinks = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${api}/api/links`);
+      const res = await fetch(LINKS_API);
       const data = await res.json();
       setLinks(data);
+    } catch (err) {
+      console.error("Failed to fetch links:", err);
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const handleDelete = async (code) => {
+    try {
+      await fetch(`${LINKS_API}/${code}`, { method: "DELETE" });
+      fetchLinks();
+    } catch (err) {
+      console.error("Failed to delete link:", err);
+    }
+  };
 
   useEffect(() => {
     fetchLinks();
   }, []);
-
-  const handleDelete = async (code) => {
-    try {
-      await fetch(`${api}/api/links/${code}`, { method: "DELETE" });
-      fetchLinks();
-    } catch (err) {
-      console.error("Failed to delete link", err);
-    }
-  };
 
   return (
     <div className="overflow-x-auto">
@@ -47,7 +49,7 @@ export default function LinkTable() {
           </thead>
           <tbody>
             {links.map((link) => {
-              const tinyLink = `${window.location.origin}/${link.short_code}`;
+              const tinyLink = `${API_BASE}/${link.short_code}`; // production-ready URL
               return (
                 <tr key={link.short_code} className="hover:bg-gray-50">
                   <td className="border border-gray-300 px-4 py-2 font-mono">
